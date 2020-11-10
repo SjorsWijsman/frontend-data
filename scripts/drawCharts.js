@@ -110,7 +110,6 @@ export function drawBarChart(container, data, titleVar, scaleVar, options) {
 
   // Show tooltip, set to mouse location and set data text
   function showTooltip(e, d) {
-    e.target()
     // Display tooltip and set to mouse location
     tooltip
       .style("left", e.clientX + "px")
