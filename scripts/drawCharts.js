@@ -2,11 +2,13 @@
 Draws a bar chart in given container (DOM Element) using data (array)
 and scales to given scaleVar (string) allowing optional options (object)
 */
-export function drawBarChart(container, data, titleVar, scaleVar, options) {
+export function drawBarChart(container, data, headers, titleVar, options) {
   // Calculate rem size for calculating responsive sizes
-  const remSize = d3.select("html").style("font-size").replace("px", "")
+  const remSize = d3.select("html").style("font-size").replace("px", "");
+  // Get variable used to scale the bar chart from selection
+  const scaleVar = d3.select("#wat-options").property("value");
 
-  const containerElement = d3.select(container)
+  const containerElement = d3.select(container);
   // Get background color, default parent container element (transparent if not set)
   const backgroundColor = options.backgroundColor || containerElement.style("background-color");
   // Get bar color, default black
@@ -16,15 +18,22 @@ export function drawBarChart(container, data, titleVar, scaleVar, options) {
   // Get bar gap, default 5
   const barGap = relativeSize(options.barGap) || relativeSize(6);
   // Get sort function
-  const sortFunction = options.sort || undefined;
+  const sort = options.sort || headers[scaleVar].order;
   // Get max display amount
   const amount = options.amount || undefined;
 
   // Sort data
-  if (sortFunction) {
-    data.sort((x, y) => {
-      return sortFunction(x[scaleVar], y[scaleVar])
-    })
+  switch(sort) {
+    case "descending":
+      data.sort((x, y) => {
+        return d3.descending(x[scaleVar], y[scaleVar])
+      })
+      break
+    case "ascending":
+      data.sort((x, y) => {
+        return d3.ascending(x[scaleVar], y[scaleVar])
+      })
+      break
   }
 
   // Cut off data past max display amount
@@ -97,10 +106,14 @@ export function drawBarChart(container, data, titleVar, scaleVar, options) {
 
   // Calculate bar length according to highest number
   function calcBarLength(d, i) {
+    let scaling = d[scaleVar] / highestNumber
     if (d[scaleVar] <= 0) {
       return 0;
     }
-    return (width - relativeSize(55)) * (d[scaleVar] / highestNumber);
+    else if (headers[scaleVar].inverted) {
+      scaling = lowestNumber / d[scaleVar]
+    }
+    return (width - relativeSize(55)) * scaling;
   }
 
   // Convert size in px to new size in px relative to 1 rem
@@ -108,7 +121,7 @@ export function drawBarChart(container, data, titleVar, scaleVar, options) {
     return size / 16 * remSize;
   }
 
-  // Show tooltip, set to mouse location and set data text
+  // Show tooltip, set to mouse location and set tooltip text
   function showTooltip(e, d) {
     // Display tooltip and set to mouse location
     tooltip
@@ -117,13 +130,16 @@ export function drawBarChart(container, data, titleVar, scaleVar, options) {
       .transition()
       .duration(50)
       .style("opacity", 0.95)
+
     // Create tooltip text displaying all information
     let tooltipText = "";
     for (const key of Object.keys(d)) {
-      const title = options.headers[key] || key;
+      const title = headers[key].title || key;
       const value = d[key].toLocaleString("nl-nl");
       tooltipText += `<span>${title}</span><span>${value}</span>`;
     }
+
+    // Add information to tooltip
     tooltip.html(tooltipText);
   }
 

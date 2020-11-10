@@ -6,11 +6,9 @@ import { data as diefstalrisico, dataHeaders as diefstalrisicoHeaders } from "/d
 function barChart() {
   const options = {
     barColor: "#B7274C",
-    sort: d3.descending,
     amount: 10,
-    headers: diefstalrisicoHeaders
   }
-  drawBarChart("#wat", diefstalrisico, "merk", "gestolen", options);
+  drawBarChart("#wat", diefstalrisico, diefstalrisicoHeaders, "merk", options);
 }
 barChart()
 
@@ -18,3 +16,5 @@ barChart()
 window.addEventListener("resize", () => {
   barChart()
 });
+
+d3.select("#wat-options").on("change", () => { barChart() })

@@ -249,10 +249,34 @@ export const data = [
 ]
 
 export const dataHeaders = {
-  "merk": "Merk",
-  "gestolen": "Aantal Gestolen",
-  "wagenpark": "Totaal Wagenpark",
-  "diefstalrisico": "Diefstalrisico 1 op ",
-  "terug": "Aantal Teruggevonden",
-  "percentageTerug": "Percentage Teruggevonden"
+  "merk": {
+    "title": "Merk",
+    "order": "descending",
+    "inverted": false
+  },
+  "gestolen": {
+    "title": "Aantal Gestolen",
+    "order": "descending",
+    "inverted": false
+  },
+  "wagenpark": {
+    "title": "Totaal Wagenpark",
+    "order": "descending",
+    "inverted": false
+  },
+  "diefstalrisico": {
+    "title": "Diefstalrisico 1 op ",
+    "order": "ascending",
+    "inverted": true
+  },
+  "terug": {
+    "title": "Aantal Teruggevonden",
+    "order": "ascending",
+    "inverted": true
+  },
+  "percentageTerug": {
+    "title": "Percentage Teruggevonden",
+    "order": "ascending",
+    "inverted": true
+  }
 }
