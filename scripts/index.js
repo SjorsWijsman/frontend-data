@@ -1,15 +1,16 @@
 import { getData } from "/scripts/getData.js"
 import { drawBarChart } from "/scripts/drawCharts.js"
-import { data as diefstalrisico } from "/data/diefstalrisico.js"
+import { data as diefstalrisico, dataHeaders as diefstalrisicoHeaders } from "/data/diefstalrisico.js"
 
 // Create barchart function with preferred barchart options
 function barChart() {
   const options = {
     barColor: "#B7274C",
     sort: d3.descending,
-    amount: 10
+    amount: 10,
+    headers: diefstalrisicoHeaders
   }
-  drawBarChart(diefstalrisico, "body", "merk", "gestolen", options);
+  drawBarChart("#wat", diefstalrisico, "merk", "gestolen", options);
 }
 barChart()
 

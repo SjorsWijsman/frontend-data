@@ -2,7 +2,7 @@
 Draws a bar chart in given container (DOM Element) using data (array)
 and scales to given scaleVar (string) allowing optional options (object)
 */
-export function drawBarChart(data, container, titleVar, scaleVar, options) {
+export function drawBarChart(container, data, titleVar, scaleVar, options) {
   // Calculate rem size for calculating responsive sizes
   const remSize = d3.select("html").style("font-size").replace("px", "")
 
@@ -50,6 +50,11 @@ export function drawBarChart(data, container, titleVar, scaleVar, options) {
     .attr("height", height)
     .style("background-color", backgroundColor)
 
+  // https://bl.ocks.org/d3noob/a22c42db65eb00d4e369
+  const tooltip = containerElement.append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0)
+
   // Calculate bar width
   const width = svg.style("width").replace("px", "");
 
@@ -67,6 +72,8 @@ export function drawBarChart(data, container, titleVar, scaleVar, options) {
     .attr("height", barWidth)
     .style("fill", barColor)
     .attr("width", (d, i) => calcBarLength(d, i))
+    .on("mousemove", (e, d) => showTooltip(e, d))
+    .on("mouseout", (e, d) => hideTooltip(e, d))
 
   // Draw title text in bar
   const titleText = bar.append("text")
@@ -76,6 +83,7 @@ export function drawBarChart(data, container, titleVar, scaleVar, options) {
     .attr("y", barWidth / 2)
     .style("fill", backgroundColor)
     .style("font-weight", "bold")
+    .style("pointer-events", "none")
     .text(d => d[titleVar])
 
   // Draw number text next to bar
@@ -83,20 +91,47 @@ export function drawBarChart(data, container, titleVar, scaleVar, options) {
     .attr("x", (d, i) => calcBarLength(d, i) + relativeSize(12))
     .attr("alignment-baseline", "central")
     .attr("y", barWidth / 2)
-    .style("fill", "black")
     .style("font-weight", "bold")
+    .style("pointer-events", "none")
     .text(d => d[scaleVar])
 
   // Calculate bar length according to highest number
   function calcBarLength(d, i) {
     if (d[scaleVar] <= 0) {
-      return 0
+      return 0;
     }
-    return (width - relativeSize(55)) * (d[scaleVar] / highestNumber)
+    return (width - relativeSize(55)) * (d[scaleVar] / highestNumber);
   }
 
   // Convert size in px to new size in px relative to 1 rem
   function relativeSize(size) {
-    return size / 16 * remSize
+    return size / 16 * remSize;
+  }
+
+  // Show tooltip, set to mouse location and set data text
+  function showTooltip(e, d) {
+    e.target()
+    // Display tooltip and set to mouse location
+    tooltip
+      .style("left", e.clientX + "px")
+      .style("top", e.clientY - tooltip.style("height").replace("px", "") + "px")
+      .transition()
+      .duration(50)
+      .style("opacity", 0.95)
+    // Create tooltip text displaying all information
+    let tooltipText = "";
+    for (const key of Object.keys(d)) {
+      const title = options.headers[key] || key;
+      const value = d[key].toLocaleString("nl-nl");
+      tooltipText += `<span>${title}</span><span>${value}</span>`;
+    }
+    tooltip.html(tooltipText);
+  }
+
+  // Hide tooltip
+  function hideTooltip(e, d) {
+    tooltip.transition()
+      .duration(200)
+      .style("opacity", 0)
   }
 }

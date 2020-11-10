@@ -247,3 +247,12 @@ export const data = [
     "percentageTerug": "43,6%"
   }
 ]
+
+export const dataHeaders = {
+  "merk": "Merk",
+  "gestolen": "Aantal Gestolen",
+  "wagenpark": "Totaal Wagenpark",
+  "diefstalrisico": "Diefstalrisico 1 op ",
+  "terug": "Aantal Teruggevonden",
+  "percentageTerug": "Percentage Teruggevonden"
+}

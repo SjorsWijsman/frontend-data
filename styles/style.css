@@ -4,9 +4,11 @@
   box-sizing: border-box;
   font-size: 1rem;
   font-family: 'Noto Sans JP', sans-serif;
+  color: var(--text-color)
 }
 
 html {
+  --text-color: #12355D;
   font-size: calc(60% + 0.8vmin);
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
@@ -17,5 +19,60 @@ body {
   max-width: 60rem;
   padding: 0.5rem;
   margin: 0 auto;
+}
+
+h1 {
+  font-size: calc(2rem + 1vmin);
+  font-weight: 700;
+  margin-bottom: 1em;
+  margin-top: 1.2em;
+  text-align: center;
+}
+
+h2 {
+  font-size: 1.6rem;
+  font-weight: 400;
+  margin-bottom: 0.3em;
+  margin-top: 2em;
+}
+
+h3 {
+  font-size: 1.2rem;
+  font-weight: 400;
+  margin-bottom: 0.4em;
+}
+
+p {
+  font-size: 1rem;
+  font-weight: 300;
+  margin-bottom: 1em;
+}
+
+main > * {
   background-color: white;
+}
+
+.tooltip {
+  padding: 1rem;
+  position: fixed;
+  background-color: white;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 0.5rem;
+  pointer-events: none;
+  font-weight: 300;
+}
+
+.tooltip > * {
+  display: flex;
+  align-items: center;
+}
+
+.tooltip > *:nth-child(odd) {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.tooltip > *:nth-child(even) {
+  font-weight: bold;
 }
