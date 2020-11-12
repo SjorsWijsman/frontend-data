@@ -122,8 +122,8 @@ export function drawBarChart(container, data, headers, titleVar, options) {
     return (width - relativeSize(55)) * scaling;
   }
 
+  // Create tooltip text displaying all information
   function tooltipText(d) {
-    // Create tooltip text displaying all information
     let tooltipText = "";
     for (const key of Object.keys(d)) {
       const title = headers[key].title || key;
@@ -146,8 +146,17 @@ export function drawBarChart(container, data, headers, titleVar, options) {
   Draws a map in given container (DOM Element) using data (array)
 */
 export async function drawMap(container, data, options) {
+  // Get variable used to scale the bar chart from selection
+  const scaleVar = d3.select("#waar-options").property("value");
   // Select d3 container element
   const containerElement = d3.select(container);
+
+  // Get highest Number
+  let highestNumber = 0
+  for (const item of Object.keys(gestolen)) {
+    if (gestolen[item][scaleVar] > highestNumber) highestNumber = gestolen[item][scaleVar];
+  }
+  console.log(highestNumber)
 
   // Remove previous svgs
   const deleteSvgs = d3.select(container).selectAll("svg").remove()
@@ -181,13 +190,20 @@ export async function drawMap(container, data, options) {
     .append("path")
     .attr("d", path)
     .attr("fill", options.color)
+    .attr("opacity", (d) => {
+      const scale = gestolen[d.properties.statnaam][scaleVar] / highestNumber
+      return scale * 0.9 + 0.1
+    })
+    .attr("stroke", options.stroke)
+    .attr("stroke-width", "0.01px")
     .on("mouseover", (e, d) => showTooltip(e, d, tooltip, tooltipText(d)))
     .on("mouseout", (e, d) => hideTooltip(tooltip))
 
+  // Create Tooltip Text
   function tooltipText(d) {
     const gemeente = d.properties.statnaam
-    if (gestolen[gemeente]) {
-      return gemeente + " " + gestolen[gemeente]
+    if (gestolen[gemeente] !== undefined) {
+      return gemeente + " " + gestolen[gemeente][scaleVar]
     } else {
       return gemeente + " data onbekend"
     }

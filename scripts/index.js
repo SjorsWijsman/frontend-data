@@ -33,7 +33,8 @@ initializeChart(() => {
 initializeChart(async () => {
   const data = await d3.json("https://cartomap.github.io/nl/wgs84/gemeente_2020.topojson");
   const options = {
-    color: "#B7274C"
+    color: "#B7274C",
+    stroke: "white",
   }
   drawMap("#waar", data, options);
-});
+}, "#waar-options");
