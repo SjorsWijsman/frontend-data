@@ -6,7 +6,7 @@ De deelvraag die ik heb onderzocht is:
 
 Live demo: https://sjorswijsman.github.io/frontend-data/
 
-Mijn code voor Functional Programming is [hier](https://github.com/SjorsWijsman/functional-programming) terug te vinden.
+Mijn code voor Functional Programming is [hier](https://github.com/SjorsWijsman/functional-programming) terug te vinden. De wiki is volledig verplaatst naar de wiki van deze repo.
 
 ## Concept
 Om deze deelvraag te visualiseren heb ik 3 visualisaties gemaakt die drie onderliggende deelvragen beantwoorden:
