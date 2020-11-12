@@ -150,13 +150,14 @@ export async function drawMap(container, data, options) {
   const scaleVar = d3.select("#waar-options").property("value");
   // Select d3 container element
   const containerElement = d3.select(container);
+  // Get bar color, default black
+  const color = options.color || "black";
 
   // Get highest Number
   let highestNumber = 0
   for (const item of Object.keys(gestolen)) {
     if (gestolen[item][scaleVar] > highestNumber) highestNumber = gestolen[item][scaleVar];
   }
-  console.log(highestNumber)
 
   // Remove previous svgs
   const deleteSvgs = d3.select(container).selectAll("svg").remove()
@@ -189,7 +190,7 @@ export async function drawMap(container, data, options) {
     .enter()
     .append("path")
     .attr("d", path)
-    .attr("fill", options.color)
+    .attr("fill", color)
     .attr("opacity", (d) => {
       const scale = gestolen[d.properties.statnaam][scaleVar] / highestNumber
       return scale * 0.9 + 0.1
