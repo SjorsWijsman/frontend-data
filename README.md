@@ -6,6 +6,8 @@ De deelvraag die ik heb onderzocht is:
 
 Live demo: https://sjorswijsman.github.io/frontend-data/
 
+Mijn code voor Functional Programming is [hier](https://github.com/SjorsWijsman/functional-programming) terug te vinden.
+
 ## Concept
 Om deze deelvraag te visualiseren heb ik 3 visualisaties gemaakt die drie onderliggende deelvragen beantwoorden:
 
@@ -19,7 +21,7 @@ Om deze deelvraag te visualiseren heb ik 3 visualisaties gemaakt die drie onderl
 *Deze visualisatie heb ik helaas niet gemaakt.*
 
 ## Handleiding
-Open index.html in een browser om de visualisaties te bekijken. Er is een actieve internetverbinding nodig om data op te halen om de kaart te visualiseren.
+Open `index.html` in een browser om de visualisaties te bekijken. Er is een actieve internetverbinding nodig om data op te halen om de kaart te visualiseren.
 
 Gebruik de dropdown menu's om te interacteren met de data. Hover over de visualisaties heen om meer informatie te krijgen.
 
