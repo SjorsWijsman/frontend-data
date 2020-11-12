@@ -10,10 +10,10 @@ Live demo: https://sjorswijsman.github.io/frontend-data/
 Om deze deelvraag te visualiseren heb ik 3 visualisaties gemaakt die drie onderliggende deelvragen beantwoorden:
 
 ### Wat voor auto's worden het meest gestolen?
-[barchart](!https://i.ibb.co/f9SVQtV/barchart.png)
+![barchart](https://i.ibb.co/f9SVQtV/barchart.png)
 
 ### Waar worden de meeste auto's gestolen?
-[map](!https://i.ibb.co/rwxH1fn/map.png)
+![map](https://i.ibb.co/rwxH1fn/map.png)
 
 ### Hoe worden auto's gestolen?
 *Deze visualisatie heb ik helaas niet gemaakt.*
