@@ -1,4 +1,4 @@
-import { data as gestolen } from "/data/gestolen.js"
+import { gestolen } from "./gestolen.js"
 
 /*
 Draws a bar chart in given container (DOM Element) using data (array), headers (object)

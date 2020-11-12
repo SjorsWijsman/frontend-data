@@ -17,13 +17,16 @@ Om deze deelvraag te visualiseren heb ik 3 visualisaties gemaakt die drie onderl
 ### Waar worden de meeste auto's gestolen?
 ![map](https://i.ibb.co/rwxH1fn/map.png)
 
-### Hoe worden auto's gestolen?
+### ~Hoe worden auto's gestolen?~
 *Deze visualisatie heb ik helaas niet gemaakt.*
 
 ## Handleiding
 Open `index.html` in een browser om de visualisaties te bekijken. Er is een actieve internetverbinding nodig om data op te halen om de kaart te visualiseren.
 
 Gebruik de dropdown menu's om te interacteren met de data. Hover over de visualisaties heen om meer informatie te krijgen.
+
+_Om aanpassingen te maken:_
+Run `npm install` in de root folder ([download npm hier](https://nodejs.org/en/download/)) om Rollup te laten werken.
 
 ## Data gebruikt
 Barchart:

@@ -1,0 +1,21 @@
+{
+  "name": "frontend-data",
+  "version": "1.0.0",
+  "description": "Repo voor frontend-data vak"
+  "scripts": {
+    "build": "rollup scripts/index.js --file bundle.js --format cjs --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SjorsWijsman/frontend-data.git"
+  },
+  "author": "Sjors Wijsman",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/SjorsWijsman/frontend-data/issues"
+  },
+  "homepage": "https://github.com/SjorsWijsman/frontend-data#readme",
+  "devDependencies": {
+    "rollup": "^2.33.1"
+  }
+}

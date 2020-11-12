@@ -1,3 +1,4 @@
+'use strict';
 
 // // Get gestolen personenauto's in 2019
 // export const data = {}
@@ -29,7 +30,7 @@
 //   }
 // }
 
-export const data = {
+const gestolen = {
   "Aa en Hunze": {
     "aantalGestolen": 0,
     "inwoners": 25390,
@@ -1805,9 +1806,566 @@ export const data = {
     "inwoners": 126116,
     "wagenpark": 52255
   }
+};
+
+for (const gemeente of Object.keys(gestolen)) {
+  gestolen[gemeente].gestolenPerInwoners = (gestolen[gemeente].aantalGestolen / gestolen[gemeente].inwoners * 10000).toFixed(2);
+  gestolen[gemeente].gestolenPerWagenpark = (gestolen[gemeente].aantalGestolen / gestolen[gemeente].wagenpark * 10000).toFixed(2);
 }
 
-for (const gemeente of Object.keys(data)) {
-  data[gemeente].gestolenPerInwoners = (data[gemeente].aantalGestolen / data[gemeente].inwoners * 10000).toFixed(2);
-  data[gemeente].gestolenPerWagenpark = (data[gemeente].aantalGestolen / data[gemeente].wagenpark * 10000).toFixed(2);
+/*
+Draws a bar chart in given container (DOM Element) using data (array), headers (object)
+and titleVar (string) allowing optional options (object)
+*/
+function drawBarChart(container, data, headers, titleVar, options) {
+  // Get variable used to scale the bar chart from selection
+  const scaleVar = d3.select("#wat-options").property("value");
+  // Select d3 container element
+  const containerElement = d3.select(container);
+  // Get background color, default parent container element (transparent if not set)
+  const backgroundColor = options.backgroundColor || containerElement.style("background-color");
+  // Get bar color, default black
+  const color = options.color || "black";
+  // Get bar width, default 50
+  const barWidth = relativeSize(options.barWidth) || relativeSize(50);
+  // Get bar gap, default 5
+  const barGap = relativeSize(options.barGap) || relativeSize(6);
+  // Get sort function
+  const sort = options.sort || headers[scaleVar].order;
+  // Get max display amount
+  const displayAmount = options.displayAmount || undefined;
+
+  // Sort data
+  switch (sort) {
+    case "descending":
+      data.sort((x, y) => {
+        return d3.descending(x[scaleVar], y[scaleVar])
+      });
+      break
+    case "ascending":
+      data.sort((x, y) => {
+        return d3.ascending(x[scaleVar], y[scaleVar])
+      });
+      break
+  }
+
+  // Cut off data past max display amount
+  if (displayAmount) {
+    data = data.slice(0, displayAmount);
+  }
+
+  // Calculate total height
+  const height = data.length * (barWidth + barGap) - barGap;
+
+  // Get highest Number
+  const highestNumber = d3.max(data, item => item[scaleVar]);
+
+  // Get lowest Number
+  const lowestNumber = d3.min(data, item => item[scaleVar]);
+
+  // Remove previous svgs
+  const deleteSvgs = d3.select(container).selectAll("svg").remove();
+
+  // Create svg "canvas" to draw on
+  const svg = containerElement.append("svg")
+    .attr("width", "100%")
+    .attr("height", height)
+    .style("background-color", backgroundColor);
+
+  // https://bl.ocks.org/d3noob/a22c42db65eb00d4e369
+  const tooltip = containerElement.append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
+
+  // Calculate bar width
+  const width = svg.style("width").replace("px", "");
+
+  // Create group for every bar
+  const bar = svg.selectAll("g")
+    .data(data)
+    .enter()
+    .append("g")
+    .attr("transform", (d, i) => {
+      return `translate(0,${i * (barWidth + barGap)})`
+    });
+
+  // Draw bar rectangles in bar group
+  const rect = bar.append("rect")
+    .attr("height", barWidth)
+    .style("fill", color)
+    .attr("width", (d, i) => calcBarLength(d))
+    .on("mousemove", (e, d) => showTooltip(e, d, tooltip, tooltipText(d)))
+    .on("mouseout", (e, d) => hideTooltip(tooltip));
+
+  // Draw title text in bar
+  const titleText = bar.append("text")
+    .attr("class", "titleText")
+    .attr("x", (d, i) => calcBarLength(d) - relativeSize(15))
+    .attr("text-anchor", "end")
+    .attr("alignment-baseline", "central")
+    .attr("y", barWidth / 2)
+    .style("fill", backgroundColor)
+    .style("font-weight", "bold")
+    .style("pointer-events", "none")
+    .text(d => d[titleVar]);
+
+  // Draw number text next to bar
+  const numberText = bar.append("text")
+    .attr("x", (d, i) => calcBarLength(d) + relativeSize(12))
+    .attr("alignment-baseline", "central")
+    .attr("y", barWidth / 2)
+    .style("font-weight", "bold")
+    .style("pointer-events", "none")
+    .text(d => d[scaleVar]);
+
+  // Calculate bar length according to highest number
+  function calcBarLength(d, i) {
+    if (d[scaleVar] <= 0) {
+      return 0;
+    }
+    // Normal scaling
+    let scaling = d[scaleVar] / highestNumber;
+    // Inverted scaling
+    if (headers[scaleVar].inverted) {
+      scaling = lowestNumber / d[scaleVar];
+    }
+    return (width - relativeSize(55)) * scaling;
+  }
+
+  // Create tooltip text displaying all information
+  function tooltipText(d) {
+    let tooltipText = "";
+    for (const key of Object.keys(d)) {
+      const title = headers[key].title || key;
+      const value = d[key].toLocaleString("nl-nl");
+      tooltipText += `<span>${title}</span><span>${value}</span>`;
+    }
+    return tooltipText
+  }
+
+  // Convert size in px to new size in px relative to 1 rem
+  function relativeSize(size) {
+    // Calculate rem size for calculating responsive sizes
+    const remSize = d3.select("html").style("font-size").replace("px", "");
+    return size / 16 * remSize;
+  }
 }
+
+
+/*
+  Draws a map in given container (DOM Element) using data (array)
+*/
+async function drawMap(container, data, options) {
+  // Get variable used to scale the bar chart from selection
+  const scaleVar = d3.select("#waar-options").property("value");
+  // Select d3 container element
+  const containerElement = d3.select(container);
+  // Get bar color, default black
+  const color = options.color || "black";
+
+  // Get highest Number
+  let highestNumber = 0;
+  for (const item of Object.keys(gestolen)) {
+    if (gestolen[item][scaleVar] > highestNumber) highestNumber = gestolen[item][scaleVar];
+  }
+
+  // Remove previous svgs
+  const deleteSvgs = d3.select(container).selectAll("svg").remove();
+
+  // Add svg & add responsiveness with viewbox
+  const svg = d3.select(container).append("svg")
+    .attr("width", "100%")
+    .attr("height", "90vh")
+    .attr("viewBox", "488.9 80 10.4 12.3");
+
+  // https://bl.ocks.org/d3noob/a22c42db65eb00d4e369
+  const tooltip = containerElement.append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
+
+  // Get geojson features from topojson
+  const geojson = topojson.feature(data, data.objects.gemeente_2020).features;
+
+  // Set projection function (lat/long > x/y)
+  const projection = d3.geoMercator();
+
+  // Add projection to path generator
+  const path = d3.geoPath()
+    .projection(projection);
+
+  // Create group & append paths
+  const g = svg.append("g")
+    .selectAll("path")
+    .data(geojson)
+    .enter()
+    .append("path")
+    .attr("d", path)
+    .attr("fill", color)
+    .attr("opacity", (d) => {
+      const scale = gestolen[d.properties.statnaam][scaleVar] / highestNumber;
+      const intensity = 0.9;
+      return scale * intensity + 1-intensity;
+    })
+    .attr("stroke", options.stroke)
+    .attr("stroke-width", "0.01px")
+    .on("mouseover", (e, d) => showTooltip(e, d, tooltip, tooltipText(d)))
+    .on("mouseout", (e, d) => hideTooltip(tooltip));
+
+  // Create Tooltip Text
+  function tooltipText(d) {
+    const gemeente = d.properties.statnaam;
+    if (gestolen[gemeente] !== undefined) {
+      return gemeente + " " + gestolen[gemeente][scaleVar]
+    } else {
+      return gemeente + " data onbekend"
+    }
+  }
+}
+
+
+/*
+  Show tooltip, set to mouse location and set tooltip text
+*/
+function showTooltip(e, d, tooltip, tooltipText) {
+  // Display tooltip and set to mouse location
+  tooltip
+    .style("left", e.clientX + "px")
+    .style("top", (e.clientY - tooltip.style("height").replace("px", "")) + "px")
+    .transition()
+    .duration(50)
+    .style("opacity", 0.95);
+
+  // Add information to tooltip
+  tooltip.html(tooltipText);
+}
+
+
+/*
+  Hide tooltip
+*/
+function hideTooltip(tooltip) {
+  tooltip.transition()
+    .duration(200)
+    .style("opacity", 0);
+}
+
+// const rawData = ["LAND ROVER", 108, 32821, 304, 47, "43,5%", "LEXUS", 53, 21852, 412, 26, "49,1%", "AUDI", 674, 287176, 426, 218, "32,3%", "VOLKSWAGEN", 1514, 1045121, 690, 503, "33,2%", "BMW", 488, 357967, 734, 184, "37,7%", "FIAT", 403, 336249, 834, 139, "34,5%", "MERCEDES-BENZ", 404, 356857, 883, 153, "37,9%", "PORSCHE", 39, 39326, 1008, 14, "35,9%", "TOYOTA", 517, 603216, 1167, 164, "31,7%", "MINI", 78, 104384, 1338, 22, "28,2%", "RENAULT", 492, 660774, 1343, 215, "43,7%", "SEAT", 147, 215960, 1469, 67, "45,6%", "PEUGEOT", 387, 697193, 1802, 194, "50,1%", "ALFA ROMEO", 29, 57151, 1971, 18, "62,1%", "MAZDA", 75, 159327, 2124, 27, "36,0%", "FORD", 266, 613509, 2306, 130, "48,9%", "OPEL", 306, 732866, 2395, 202, "66,0%", "CITROEN", 168, 406261, 2418, 92, "54,8%", "VOLVO", 145, 370225, 2553, 80, "55,2%", "DAIHATSU", 21, 61491, 2928, 16, "76,2%", "HONDA", 27, 81895, 3033, 18, "66,7%", "NISSAN", 76, 235505, 3099, 43, "56,6%", "CHEVROLET", 24, 75099, 3129, 13, "54,2%", "MITSUBISHI", 43, 139115, 3235, 34, "79,1%", "SKODA", 59, 194952, 3304, 31, "52,5%", "KIA", 79, 284905, 3606, 66, "83,5%", "SUZUKI", 61, 270794, 4439, 38, "62,3%", "HYUNDAI", 59, 266909, 4524, 43, "72,9%", "OVERIGE", 179, 453590, 2534, 78, "43,6%"]
+//
+// const dataList = ["merk", "gestolen", "wagenpark", "diefstalrisico", "terug", "percentageTerug"];
+// const dataPerGroup = dataList.length;
+//
+// const data = []
+//
+// for (var i = 0; i < rawData.length / dataPerGroup; i++) {
+//   let dataObject = {}
+//   for (var x = 0; x < dataPerGroup; x++) {
+//     dataObject[dataList[x]] = rawData[i * dataPerGroup + x]
+//   }
+//   data.push(dataObject);
+// }
+
+const diefstalrisico = [
+  {
+    "merk": "LAND ROVER",
+    "gestolen": 108,
+    "wagenpark": 32821,
+    "diefstalrisico": 304,
+    "terug": 47,
+    "percentageTerug": "43,5%"
+  },
+  {
+    "merk": "LEXUS",
+    "gestolen": 53,
+    "wagenpark": 21852,
+    "diefstalrisico": 412,
+    "terug": 26,
+    "percentageTerug": "49,1%"
+  },
+  {
+    "merk": "AUDI",
+    "gestolen": 674,
+    "wagenpark": 287176,
+    "diefstalrisico": 426,
+    "terug": 218,
+    "percentageTerug": "32,3%"
+  },
+  {
+    "merk": "VOLKSWAGEN",
+    "gestolen": 1514,
+    "wagenpark": 1045121,
+    "diefstalrisico": 690,
+    "terug": 503,
+    "percentageTerug": "33,2%"
+  },
+  {
+    "merk": "BMW",
+    "gestolen": 488,
+    "wagenpark": 357967,
+    "diefstalrisico": 734,
+    "terug": 184,
+    "percentageTerug": "37,7%"
+  },
+  {
+    "merk": "FIAT",
+    "gestolen": 403,
+    "wagenpark": 336249,
+    "diefstalrisico": 834,
+    "terug": 139,
+    "percentageTerug": "34,5%"
+  },
+  {
+    "merk": "MERCEDES-BENZ",
+    "gestolen": 404,
+    "wagenpark": 356857,
+    "diefstalrisico": 883,
+    "terug": 153,
+    "percentageTerug": "37,9%"
+  },
+  {
+    "merk": "PORSCHE",
+    "gestolen": 39,
+    "wagenpark": 39326,
+    "diefstalrisico": 1008,
+    "terug": 14,
+    "percentageTerug": "35,9%"
+  },
+  {
+    "merk": "TOYOTA",
+    "gestolen": 517,
+    "wagenpark": 603216,
+    "diefstalrisico": 1167,
+    "terug": 164,
+    "percentageTerug": "31,7%"
+  },
+  {
+    "merk": "MINI",
+    "gestolen": 78,
+    "wagenpark": 104384,
+    "diefstalrisico": 1338,
+    "terug": 22,
+    "percentageTerug": "28,2%"
+  },
+  {
+    "merk": "RENAULT",
+    "gestolen": 492,
+    "wagenpark": 660774,
+    "diefstalrisico": 1343,
+    "terug": 215,
+    "percentageTerug": "43,7%"
+  },
+  {
+    "merk": "SEAT",
+    "gestolen": 147,
+    "wagenpark": 215960,
+    "diefstalrisico": 1469,
+    "terug": 67,
+    "percentageTerug": "45,6%"
+  },
+  {
+    "merk": "PEUGEOT",
+    "gestolen": 387,
+    "wagenpark": 697193,
+    "diefstalrisico": 1802,
+    "terug": 194,
+    "percentageTerug": "50,1%"
+  },
+  {
+    "merk": "ALFA ROMEO",
+    "gestolen": 29,
+    "wagenpark": 57151,
+    "diefstalrisico": 1971,
+    "terug": 18,
+    "percentageTerug": "62,1%"
+  },
+  {
+    "merk": "MAZDA",
+    "gestolen": 75,
+    "wagenpark": 159327,
+    "diefstalrisico": 2124,
+    "terug": 27,
+    "percentageTerug": "36,0%"
+  },
+  {
+    "merk": "FORD",
+    "gestolen": 266,
+    "wagenpark": 613509,
+    "diefstalrisico": 2306,
+    "terug": 130,
+    "percentageTerug": "48,9%"
+  },
+  {
+    "merk": "OPEL",
+    "gestolen": 306,
+    "wagenpark": 732866,
+    "diefstalrisico": 2395,
+    "terug": 202,
+    "percentageTerug": "66,0%"
+  },
+  {
+    "merk": "CITROEN",
+    "gestolen": 168,
+    "wagenpark": 406261,
+    "diefstalrisico": 2418,
+    "terug": 92,
+    "percentageTerug": "54,8%"
+  },
+  {
+    "merk": "VOLVO",
+    "gestolen": 145,
+    "wagenpark": 370225,
+    "diefstalrisico": 2553,
+    "terug": 80,
+    "percentageTerug": "55,2%"
+  },
+  {
+    "merk": "DAIHATSU",
+    "gestolen": 21,
+    "wagenpark": 61491,
+    "diefstalrisico": 2928,
+    "terug": 16,
+    "percentageTerug": "76,2%"
+  },
+  {
+    "merk": "HONDA",
+    "gestolen": 27,
+    "wagenpark": 81895,
+    "diefstalrisico": 3033,
+    "terug": 18,
+    "percentageTerug": "66,7%"
+  },
+  {
+    "merk": "NISSAN",
+    "gestolen": 76,
+    "wagenpark": 235505,
+    "diefstalrisico": 3099,
+    "terug": 43,
+    "percentageTerug": "56,6%"
+  },
+  {
+    "merk": "CHEVROLET",
+    "gestolen": 24,
+    "wagenpark": 75099,
+    "diefstalrisico": 3129,
+    "terug": 13,
+    "percentageTerug": "54,2%"
+  },
+  {
+    "merk": "MITSUBISHI",
+    "gestolen": 43,
+    "wagenpark": 139115,
+    "diefstalrisico": 3235,
+    "terug": 34,
+    "percentageTerug": "79,1%"
+  },
+  {
+    "merk": "SKODA",
+    "gestolen": 59,
+    "wagenpark": 194952,
+    "diefstalrisico": 3304,
+    "terug": 31,
+    "percentageTerug": "52,5%"
+  },
+  {
+    "merk": "KIA",
+    "gestolen": 79,
+    "wagenpark": 284905,
+    "diefstalrisico": 3606,
+    "terug": 66,
+    "percentageTerug": "83,5%"
+  },
+  {
+    "merk": "SUZUKI",
+    "gestolen": 61,
+    "wagenpark": 270794,
+    "diefstalrisico": 4439,
+    "terug": 38,
+    "percentageTerug": "62,3%"
+  },
+  {
+    "merk": "HYUNDAI",
+    "gestolen": 59,
+    "wagenpark": 266909,
+    "diefstalrisico": 4524,
+    "terug": 43,
+    "percentageTerug": "72,9%"
+  },
+  {
+    "merk": "OVERIGE",
+    "gestolen": 179,
+    "wagenpark": 453590,
+    "diefstalrisico": 2534,
+    "terug": 78,
+    "percentageTerug": "43,6%"
+  }
+];
+
+const diefstalrisicoHeaders = {
+  "merk": {
+    "title": "Merk",
+    "order": "descending",
+    "inverted": false
+  },
+  "gestolen": {
+    "title": "Aantal Gestolen",
+    "order": "descending",
+    "inverted": false
+  },
+  "wagenpark": {
+    "title": "Totaal Wagenpark",
+    "order": "descending",
+    "inverted": false
+  },
+  "diefstalrisico": {
+    "title": "Diefstalrisico 1 op ",
+    "order": "ascending",
+    "inverted": true
+  },
+  "terug": {
+    "title": "Aantal Teruggevonden",
+    "order": "ascending",
+    "inverted": true
+  },
+  "percentageTerug": {
+    "title": "Percentage Teruggevonden",
+    "order": "ascending",
+    "inverted": true
+  }
+};
+
+// Initialize chart and add function to resize & selectElement change.
+function initializeChart(chartFunction, selectElement) {
+  chartFunction();
+
+  // Redraw on resize to refit to container
+  window.addEventListener("resize", () => {
+    chartFunction();
+  });
+
+  // Select dropdown & redraw chart on change
+  if (selectElement) {
+    d3.select(selectElement).on("change", () => {
+      chartFunction();
+    });
+  }
+}
+
+// Initialize Bar chart
+initializeChart(() => {
+  const data = diefstalrisico;
+  const dataHeaders = diefstalrisicoHeaders;
+  const options = {
+    color: "#B7274C",
+    displayAmount: 10,
+  };
+  drawBarChart("#wat", data, dataHeaders, "merk", options);
+}, "#wat-options");
+
+// Initialize map
+initializeChart(async () => {
+  const data = await d3.json("https://cartomap.github.io/nl/wgs84/gemeente_2020.topojson");
+  const options = {
+    color: "#B7274C",
+    stroke: "white",
+  };
+  drawMap("#waar", data, options);
+}, "#waar-options");

@@ -13,7 +13,7 @@
 //   data.push(dataObject);
 // }
 
-export const data = [
+export const diefstalrisico = [
   {
     "merk": "LAND ROVER",
     "gestolen": 108,
@@ -248,7 +248,7 @@ export const data = [
   }
 ]
 
-export const dataHeaders = {
+export const diefstalrisicoHeaders = {
   "merk": {
     "title": "Merk",
     "order": "descending",

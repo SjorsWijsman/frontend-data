@@ -1,5 +1,5 @@
 import { drawBarChart, drawMap } from "./drawCharts.js"
-import { data as diefstalrisico, dataHeaders as diefstalrisicoHeaders } from "/data/diefstalrisico.js"
+import { diefstalrisico, diefstalrisicoHeaders } from "./diefstalrisico.js"
 
 // Initialize chart and add function to resize & selectElement change.
 function initializeChart(chartFunction, selectElement) {
