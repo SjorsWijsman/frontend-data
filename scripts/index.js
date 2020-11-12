@@ -1,7 +1,7 @@
-import { getData } from "./getData.js"
 import { drawBarChart, drawMap } from "./drawCharts.js"
 import { data as diefstalrisico, dataHeaders as diefstalrisicoHeaders } from "/data/diefstalrisico.js"
 
+// Initialize chart and add function to resize & selectElement change.
 function initializeChart(chartFunction, selectElement) {
   chartFunction()
 

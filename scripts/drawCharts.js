@@ -1,8 +1,8 @@
 import { data as gestolen } from "/data/gestolen.js"
 
 /*
-Draws a bar chart in given container (DOM Element) using data (array)
-and scales to given scaleVar (string) allowing optional options (object)
+Draws a bar chart in given container (DOM Element) using data (array), headers (object)
+and titleVar (string) allowing optional options (object)
 */
 export function drawBarChart(container, data, headers, titleVar, options) {
   // Get variable used to scale the bar chart from selection
@@ -66,9 +66,6 @@ export function drawBarChart(container, data, headers, titleVar, options) {
 
   // Calculate bar width
   const width = svg.style("width").replace("px", "");
-
-  const t = svg.transition()
-        .duration(750);
 
   // Create group for every bar
   const bar = svg.selectAll("g")
@@ -192,8 +189,9 @@ export async function drawMap(container, data, options) {
     .attr("d", path)
     .attr("fill", color)
     .attr("opacity", (d) => {
-      const scale = gestolen[d.properties.statnaam][scaleVar] / highestNumber
-      return scale * 0.9 + 0.1
+      const scale = gestolen[d.properties.statnaam][scaleVar] / highestNumber;
+      const intensity = 0.9;
+      return scale * intensity + 1-intensity;
     })
     .attr("stroke", options.stroke)
     .attr("stroke-width", "0.01px")
@@ -212,7 +210,6 @@ export async function drawMap(container, data, options) {
 }
 
 
-
 /*
   Show tooltip, set to mouse location and set tooltip text
 */
@@ -220,7 +217,7 @@ function showTooltip(e, d, tooltip, tooltipText) {
   // Display tooltip and set to mouse location
   tooltip
     .style("left", e.clientX + "px")
-    .style("top", e.clientY - tooltip.style("height").replace("px", "") + "px")
+    .style("top", (e.clientY - tooltip.style("height").replace("px", "")) + "px")
     .transition()
     .duration(50)
     .style("opacity", 0.95)
@@ -228,7 +225,6 @@ function showTooltip(e, d, tooltip, tooltipText) {
   // Add information to tooltip
   tooltip.html(tooltipText);
 }
-
 
 
 /*

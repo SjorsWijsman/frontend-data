@@ -27,8 +27,8 @@ Gebruik de dropdown menu's om te interacteren met de data. Hover over de visuali
 
 ## Data gebruikt
 Barchart:
-* Statistiek voertuigdiefstal 2019 - Data aangevraagd bij het LIV
-Kaart:
+* Statistiek voertuigdiefstal 2019 - Data aangevraagd bij het LIV  
+Kaart:  
 * Cartografische data - https://github.com/cartomap/nl
 * Gestolen auto's per gemeente - https://localfocuswidgets.net/5f0c4c5e18d62
 * Inwoners per gemeente - https://www.uitvoeringvanbeleidszw.nl/subsidies-en-regelingen/veranderopgave-inburgering-pilots/documenten/publicaties/subsidies/veranderopgave-inburgering-pilots/tabel-aantal-inwoners-gemeenten-per-1-januari-2019/tabel-aantal-inwoners-gemeenten-per-1-januari-2019
