@@ -3,8 +3,6 @@ Draws a bar chart in given container (DOM Element) using data (array)
 and scales to given scaleVar (string) allowing optional options (object)
 */
 export function drawBarChart(container, data, headers, titleVar, options) {
-  // Calculate rem size for calculating responsive sizes
-  const remSize = d3.select("html").style("font-size").replace("px", "");
   // Get variable used to scale the bar chart from selection
   const scaleVar = d3.select("#wat-options").property("value");
 
@@ -23,7 +21,7 @@ export function drawBarChart(container, data, headers, titleVar, options) {
   const amount = options.amount || undefined;
 
   // Sort data
-  switch(sort) {
+  switch (sort) {
     case "descending":
       data.sort((x, y) => {
         return d3.descending(x[scaleVar], y[scaleVar])
@@ -51,7 +49,7 @@ export function drawBarChart(container, data, headers, titleVar, options) {
   const lowestNumber = d3.min(data, item => item[scaleVar]);
 
   // Remove previous svgs
-  const deleteSvgs = d3.selectAll("svg").remove()
+  const deleteSvgs = d3.select(container).selectAll("svg").remove()
 
   // Create svg "canvas" to draw on
   const svg = containerElement.append("svg")
@@ -106,19 +104,16 @@ export function drawBarChart(container, data, headers, titleVar, options) {
 
   // Calculate bar length according to highest number
   function calcBarLength(d, i) {
-    let scaling = d[scaleVar] / highestNumber
     if (d[scaleVar] <= 0) {
       return 0;
     }
-    else if (headers[scaleVar].inverted) {
+    // Normal scaling
+    let scaling = d[scaleVar] / highestNumber
+    // Inverted scaling
+    if (headers[scaleVar].inverted) {
       scaling = lowestNumber / d[scaleVar]
     }
     return (width - relativeSize(55)) * scaling;
-  }
-
-  // Convert size in px to new size in px relative to 1 rem
-  function relativeSize(size) {
-    return size / 16 * remSize;
   }
 
   // Show tooltip, set to mouse location and set tooltip text
@@ -149,4 +144,49 @@ export function drawBarChart(container, data, headers, titleVar, options) {
       .duration(200)
       .style("opacity", 0)
   }
+}
+
+
+/*
+  Draws a map in given container (DOM Element) using data (array)
+*/
+export async function drawMap(container, data) {
+  // Remove previous svgs
+  const deleteSvgs = d3.select(container).selectAll("svg").remove()
+
+  const svg = d3.select(container).append("svg")
+    .attr("width", "100%")
+    .attr("height", "90vh")
+
+  const scale = 11000
+
+  const projection = d3.geoMercator()
+    .scale(scale)
+    .translate([-500, 12330]);
+
+  const path = d3.geoPath()
+    .projection(projection)
+
+  const g = svg.append("g")
+    .selectAll("path")
+    .data(data.features)
+    .enter()
+    .append("path")
+    .attr("d", path)
+    .on("mouseover", function(e, d) {
+      d3.select(this)
+        .classed("active", true)
+    })
+    .on("mouseout", function(e, d) {
+      d3.select(this)
+        .classed("active", false)
+    })
+}
+
+
+// Convert size in px to new size in px relative to 1 rem
+function relativeSize(size) {
+  // Calculate rem size for calculating responsive sizes
+  const remSize = d3.select("html").style("font-size").replace("px", "");
+  return size / 16 * remSize;
 }
