@@ -6,7 +6,7 @@ De deelvraag die ik heb onderzocht is:
 
 Live demo: https://sjorswijsman.github.io/frontend-data/
 
-Mijn code voor Functional Programming is [hier](https://github.com/SjorsWijsman/functional-programming) terug te vinden.
+Mijn code voor Functional Programming is [hier](https://github.com/SjorsWijsman/functional-programming) terug te vinden. De wiki is volledig verplaatst naar de wiki van deze repo.
 
 ## Concept
 Om deze deelvraag te visualiseren heb ik 3 visualisaties gemaakt die drie onderliggende deelvragen beantwoorden:
@@ -27,8 +27,8 @@ Gebruik de dropdown menu's om te interacteren met de data. Hover over de visuali
 
 ## Data gebruikt
 Barchart:
-* Statistiek voertuigdiefstal 2019 - Data aangevraagd bij het LIV
-Kaart:
+* Statistiek voertuigdiefstal 2019 - Data aangevraagd bij het LIV  
+Kaart:  
 * Cartografische data - https://github.com/cartomap/nl
 * Gestolen auto's per gemeente - https://localfocuswidgets.net/5f0c4c5e18d62
 * Inwoners per gemeente - https://www.uitvoeringvanbeleidszw.nl/subsidies-en-regelingen/veranderopgave-inburgering-pilots/documenten/publicaties/subsidies/veranderopgave-inburgering-pilots/tabel-aantal-inwoners-gemeenten-per-1-januari-2019/tabel-aantal-inwoners-gemeenten-per-1-januari-2019
