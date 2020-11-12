@@ -10,12 +10,13 @@ function initializeChart(chartFunction, selectElement) {
     chartFunction()
   });
 
-  // Select dropdown & redraw barchart on change
+  // Select dropdown & redraw chart on change
   if (selectElement) {
-    d3.select(selectElement).on("change", () => { chartFunction() })
+    d3.select(selectElement).on("change", () => {
+      chartFunction()
+    })
   }
 }
-
 
 initializeChart(() => {
   const data = diefstalrisico;
@@ -29,6 +30,6 @@ initializeChart(() => {
 
 
 initializeChart(async () => {
-  const data = await d3.json("https://opendata.arcgis.com/datasets/e1f0dd70abcb4fceabbc43412e43ad4b_0.geojson");
+  const data = await d3.json("https://cartomap.github.io/nl/wgs84/gemeente_2020.topojson");
   drawMap("#waar", data);
 });

@@ -154,26 +154,31 @@ export async function drawMap(container, data) {
   // Remove previous svgs
   const deleteSvgs = d3.select(container).selectAll("svg").remove()
 
+  // Add svg & add responsiveness with viewbox
   const svg = d3.select(container).append("svg")
     .attr("width", "100%")
     .attr("height", "90vh")
+    .attr("viewBox", "488.9 80 10.4 12.3")
 
-  const scale = 11000
+  // Get geojson features from topojson
+  const geojson = topojson.feature(data, data.objects.gemeente_2020).features;
 
+  // Set projection function (lat/long > x/y)
   const projection = d3.geoMercator()
-    .scale(scale)
-    .translate([-500, 12330]);
 
+  // Add projection to path generator
   const path = d3.geoPath()
     .projection(projection)
 
+  // Create group & append paths
   const g = svg.append("g")
     .selectAll("path")
-    .data(data.features)
+    .data(geojson)
     .enter()
     .append("path")
     .attr("d", path)
     .on("mouseover", function(e, d) {
+      console.log("mouseover")
       d3.select(this)
         .classed("active", true)
     })
