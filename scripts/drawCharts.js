@@ -1,3 +1,5 @@
+import { data as gestolen } from "/data/gestolen.js"
+
 /*
 Draws a bar chart in given container (DOM Element) using data (array)
 and scales to given scaleVar (string) allowing optional options (object)
@@ -5,12 +7,12 @@ and scales to given scaleVar (string) allowing optional options (object)
 export function drawBarChart(container, data, headers, titleVar, options) {
   // Get variable used to scale the bar chart from selection
   const scaleVar = d3.select("#wat-options").property("value");
-
+  // Select d3 container element
   const containerElement = d3.select(container);
   // Get background color, default parent container element (transparent if not set)
   const backgroundColor = options.backgroundColor || containerElement.style("background-color");
   // Get bar color, default black
-  const barColor = options.barColor || "black";
+  const color = options.color || "black";
   // Get bar width, default 50
   const barWidth = relativeSize(options.barWidth) || relativeSize(50);
   // Get bar gap, default 5
@@ -18,7 +20,7 @@ export function drawBarChart(container, data, headers, titleVar, options) {
   // Get sort function
   const sort = options.sort || headers[scaleVar].order;
   // Get max display amount
-  const amount = options.amount || undefined;
+  const displayAmount = options.displayAmount || undefined;
 
   // Sort data
   switch (sort) {
@@ -35,8 +37,8 @@ export function drawBarChart(container, data, headers, titleVar, options) {
   }
 
   // Cut off data past max display amount
-  if (amount) {
-    data = data.slice(0, amount)
+  if (displayAmount) {
+    data = data.slice(0, displayAmount)
   }
 
   // Calculate total height
@@ -65,6 +67,9 @@ export function drawBarChart(container, data, headers, titleVar, options) {
   // Calculate bar width
   const width = svg.style("width").replace("px", "");
 
+  const t = svg.transition()
+        .duration(750);
+
   // Create group for every bar
   const bar = svg.selectAll("g")
     .data(data)
@@ -77,15 +82,16 @@ export function drawBarChart(container, data, headers, titleVar, options) {
   // Draw bar rectangles in bar group
   const rect = bar.append("rect")
     .attr("height", barWidth)
-    .style("fill", barColor)
+    .style("fill", color)
     .attr("width", (d, i) => calcBarLength(d, i))
-    .on("mousemove", (e, d) => showTooltip(e, d))
-    .on("mouseout", (e, d) => hideTooltip(e, d))
+    .on("mousemove", (e, d) => showTooltip(e, d, tooltip, tooltipText(d)))
+    .on("mouseout", (e, d) => hideTooltip(tooltip))
 
   // Draw title text in bar
   const titleText = bar.append("text")
-    .attr("text-anchor", "end")
+    .attr("class", "titleText")
     .attr("x", (d, i) => calcBarLength(d, i) - relativeSize(15))
+    .attr("text-anchor", "end")
     .attr("alignment-baseline", "central")
     .attr("y", barWidth / 2)
     .style("fill", backgroundColor)
@@ -116,16 +122,7 @@ export function drawBarChart(container, data, headers, titleVar, options) {
     return (width - relativeSize(55)) * scaling;
   }
 
-  // Show tooltip, set to mouse location and set tooltip text
-  function showTooltip(e, d) {
-    // Display tooltip and set to mouse location
-    tooltip
-      .style("left", e.clientX + "px")
-      .style("top", e.clientY - tooltip.style("height").replace("px", "") + "px")
-      .transition()
-      .duration(50)
-      .style("opacity", 0.95)
-
+  function tooltipText(d) {
     // Create tooltip text displaying all information
     let tooltipText = "";
     for (const key of Object.keys(d)) {
@@ -133,16 +130,14 @@ export function drawBarChart(container, data, headers, titleVar, options) {
       const value = d[key].toLocaleString("nl-nl");
       tooltipText += `<span>${title}</span><span>${value}</span>`;
     }
-
-    // Add information to tooltip
-    tooltip.html(tooltipText);
+    return tooltipText
   }
 
-  // Hide tooltip
-  function hideTooltip(e, d) {
-    tooltip.transition()
-      .duration(200)
-      .style("opacity", 0)
+  // Convert size in px to new size in px relative to 1 rem
+  function relativeSize(size) {
+    // Calculate rem size for calculating responsive sizes
+    const remSize = d3.select("html").style("font-size").replace("px", "");
+    return size / 16 * remSize;
   }
 }
 
@@ -150,7 +145,10 @@ export function drawBarChart(container, data, headers, titleVar, options) {
 /*
   Draws a map in given container (DOM Element) using data (array)
 */
-export async function drawMap(container, data) {
+export async function drawMap(container, data, options) {
+  // Select d3 container element
+  const containerElement = d3.select(container);
+
   // Remove previous svgs
   const deleteSvgs = d3.select(container).selectAll("svg").remove()
 
@@ -159,6 +157,11 @@ export async function drawMap(container, data) {
     .attr("width", "100%")
     .attr("height", "90vh")
     .attr("viewBox", "488.9 80 10.4 12.3")
+
+  // https://bl.ocks.org/d3noob/a22c42db65eb00d4e369
+  const tooltip = containerElement.append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0)
 
   // Get geojson features from topojson
   const geojson = topojson.feature(data, data.objects.gemeente_2020).features;
@@ -177,21 +180,45 @@ export async function drawMap(container, data) {
     .enter()
     .append("path")
     .attr("d", path)
-    .on("mouseover", function(e, d) {
-      console.log("mouseover")
-      d3.select(this)
-        .classed("active", true)
-    })
-    .on("mouseout", function(e, d) {
-      d3.select(this)
-        .classed("active", false)
-    })
+    .attr("fill", options.color)
+    .on("mouseover", (e, d) => showTooltip(e, d, tooltip, tooltipText(d)))
+    .on("mouseout", (e, d) => hideTooltip(tooltip))
+
+  function tooltipText(d) {
+    const gemeente = d.properties.statnaam
+    if (gestolen[gemeente]) {
+      return gemeente + " " + gestolen[gemeente]
+    } else {
+      return gemeente + " data onbekend"
+    }
+  }
 }
 
 
-// Convert size in px to new size in px relative to 1 rem
-function relativeSize(size) {
-  // Calculate rem size for calculating responsive sizes
-  const remSize = d3.select("html").style("font-size").replace("px", "");
-  return size / 16 * remSize;
+
+/*
+  Show tooltip, set to mouse location and set tooltip text
+*/
+function showTooltip(e, d, tooltip, tooltipText) {
+  // Display tooltip and set to mouse location
+  tooltip
+    .style("left", e.clientX + "px")
+    .style("top", e.clientY - tooltip.style("height").replace("px", "") + "px")
+    .transition()
+    .duration(50)
+    .style("opacity", 0.95)
+
+  // Add information to tooltip
+  tooltip.html(tooltipText);
+}
+
+
+
+/*
+  Hide tooltip
+*/
+function hideTooltip(tooltip) {
+  tooltip.transition()
+    .duration(200)
+    .style("opacity", 0)
 }
