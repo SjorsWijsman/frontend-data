@@ -2024,11 +2024,15 @@ async function drawMap(container, data, options) {
     let value = gestolen[gemeente][scaleVar];
     if (gestolen[gemeente] !== undefined) {
       if (typeof value === "number") {
-        return gemeente + " " + value.toLocaleString("nl-nl");
+        value = value.toLocaleString("nl-nl");
       } else {
-        return gemeente + " " + value.replace(".", ",");
+        value = value.replace(".", ",");
       }
     }
+    else {
+      value = "data onbekend";
+    }
+    return `<span>${gemeente}</span><span>${value}</span>`
   }
 }
 
