@@ -1982,7 +1982,7 @@ async function drawMap(container, data, options) {
   // Add svg & add responsiveness with viewbox
   const svg = d3.select(container).append("svg")
     .attr("width", "100%")
-    .attr("height", "90vh")
+    .attr("height", "80vh")
     .attr("viewBox", "488.9 80 10.4 12.3");
 
   // https://bl.ocks.org/d3noob/a22c42db65eb00d4e369
