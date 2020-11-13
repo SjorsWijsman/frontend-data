@@ -2492,10 +2492,10 @@ initializeChart(() => {
 // Initialize map
 initializeChart(async () => {
   const storage = window.sessionStorage;
-  let data = JSON.parse(storage.getItem("data"));
+  let data = JSON.parse(storage.getItem("data-37167725"));
   if (data === null) {
     data = await d3.json("https://cartomap.github.io/nl/wgs84/gemeente_2020.topojson");
-    storage.setItem("data", JSON.stringify(data));
+    storage.setItem("data-37167725", JSON.stringify(data));
   }
   const options = {
     color: "#B7274C",
