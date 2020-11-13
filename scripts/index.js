@@ -1,5 +1,5 @@
 import { drawBarChart, drawMap } from "./drawCharts.js"
-import { diefstalrisico, diefstalrisicoHeaders } from "./diefstalrisico.js"
+import { diefstalrisico, diefstalrisicoTypes, diefstalrisicoHeaders } from "./diefstalrisico.js"
 
 // Initialize chart and add function to resize & selectElement change.
 function initializeChart(chartFunction, selectElement) {
@@ -20,7 +20,7 @@ function initializeChart(chartFunction, selectElement) {
 
 // Initialize Bar chart
 initializeChart(() => {
-  const data = diefstalrisico;
+  const data = [diefstalrisico, diefstalrisicoTypes];
   const dataHeaders = diefstalrisicoHeaders;
   const options = {
     color: "#B7274C",

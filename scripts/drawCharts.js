@@ -4,9 +4,16 @@ import { gestolen } from "./gestolen.js"
 Draws a bar chart in given container (DOM Element) using data (array), headers (object)
 and titleVar (string) allowing optional options (object)
 */
-export function drawBarChart(container, data, headers, titleVar, options) {
+export function drawBarChart(container, datasets, headers, titleVar, options) {
+  // Get selection from select element
+  const selection = d3.select("#wat-options").property("value").split(" ");
+  // Get which dataset to use
+  let data = datasets[0]
+  if (selection[0] === "type") {
+    data = datasets[1]
+  }
   // Get variable used to scale the bar chart from selection
-  const scaleVar = d3.select("#wat-options").property("value");
+  const scaleVar = selection[1];
   // Select d3 container element
   const containerElement = d3.select(container);
   // Get background color, default parent container element (transparent if not set)
@@ -208,7 +215,8 @@ export async function drawMap(container, data, options) {
       } else {
         return gemeente + " " + value.replace(".", ",");
       }
-    return gemeente + " data onbekend";
+      return gemeente + " data onbekend";
+    }
   }
 }
 
@@ -236,5 +244,5 @@ function showTooltip(e, d, tooltip, tooltipText) {
 function hideTooltip(tooltip) {
   tooltip.transition()
     .duration(200)
-    .style("opacity", 0)
+    .style("opacity", 0);
 }

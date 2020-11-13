@@ -1817,9 +1817,16 @@ for (const gemeente of Object.keys(gestolen)) {
 Draws a bar chart in given container (DOM Element) using data (array), headers (object)
 and titleVar (string) allowing optional options (object)
 */
-function drawBarChart(container, data, headers, titleVar, options) {
+function drawBarChart(container, datasets, headers, titleVar, options) {
+  // Get selection from select element
+  const selection = d3.select("#wat-options").property("value").split(" ");
+  // Get which dataset to use
+  let data = datasets[0];
+  if (selection[0] === "type") {
+    data = datasets[1];
+  }
   // Get variable used to scale the bar chart from selection
-  const scaleVar = d3.select("#wat-options").property("value");
+  const scaleVar = selection[1];
   // Select d3 container element
   const containerElement = d3.select(container);
   // Get background color, default parent container element (transparent if not set)
@@ -2021,8 +2028,6 @@ async function drawMap(container, data, options) {
       } else {
         return gemeente + " " + value.replace(".", ",");
       }
-    } else {
-      return gemeente + " data onbekend";
     }
   }
 }
@@ -2304,9 +2309,124 @@ const diefstalrisico = [
   }
 ];
 
+const diefstalrisicoTypes = [
+  {
+    "merk": "AUDI A1",
+    "gestolen": 214,
+    "wagenpark": 27449,
+    "diefstalrisico": 128,
+    "terug": 33,
+    "percentageTerug": "15,4%",
+  },
+  {
+    "merk": "TOYOTA C-HR",
+    "gestolen": 120,
+    "wagenpark": 15797,
+    "diefstalrisico": 132,
+    "terug": 22,
+    "percentageTerug": "18,3%"
+  },
+  {
+    "merk": "MERCEDES-BENZ E-KLASSE",
+    "gestolen": 112,
+    "wagenpark": 38947,
+    "diefstalrisico": 348,
+    "terug": 46,
+    "percentageTerug": "41,1%",
+  },
+  {
+    "merk": "FIAT 500",
+    "gestolen": 222,
+    "wagenpark": 94296,
+    "diefstalrisico": 425,
+    "terug": 44,
+    "percentageTerug": "19,8%",
+  },
+  {
+    "merk": "VOLKSWAGEN POLO",
+    "gestolen": 584,
+    "wagenpark": 277768,
+    "diefstalrisico": 476,
+    "terug": 168,
+    "percentageTerug": "28,8%",
+  },
+  {
+    "merk": "BMW 5ER REIHE",
+    "gestolen": 121,
+    "wagenpark": 59495,
+    "diefstalrisico": 492,
+    "terug": 48,
+    "percentageTerug": "39,7%",
+  },
+  {
+    "merk": "VOLKSWAGEN GOLF",
+    "gestolen": 582,
+    "wagenpark": 333040,
+    "diefstalrisico": 572,
+    "terug": 187,
+    "percentageTerug": "32,1%",
+  },
+  {
+    "merk": "AUDI A4",
+    "gestolen": 107,
+    "wagenpark": 66357,
+    "diefstalrisico": 620,
+    "terug": 42,
+    "percentageTerug": "39,3%",
+  },
+  {
+    "merk": "AUDI A3",
+    "gestolen": 113,
+    "wagenpark": 79094,
+    "diefstalrisico": 700,
+    "terug": 51,
+    "percentageTerug": "45,1%",
+  },
+  {
+    "merk": "BMW 3ER REIHE",
+    "gestolen": 165,
+    "wagenpark": 124034,
+    "diefstalrisico": 752,
+    "terug": 66,
+    "percentageTerug": "40,0%",
+  },
+  {
+    "merk": "TOTOTA AYGO",
+    "gestolen": 148,
+    "wagenpark": 147340,
+    "diefstalrisico": 996,
+    "terug": 42,
+    "percentageTerug": "28,4%",
+  },
+  {
+    "merk": "RENAULT MEGANE",
+    "gestolen": 101,
+    "wagenpark": 100866,
+    "diefstalrisico": 999,
+    "terug": 65,
+    "percentageTerug": "64,4%",
+  },
+  {
+    "merk": "RENAULT CLIO",
+    "gestolen": 163,
+    "wagenpark": 176225,
+    "diefstalrisico": 1081,
+    "terug": 62,
+    "percentageTerug": "38,0%",
+  },
+  {
+    "merk": "OPEL CORSA",
+    "gestolen": 131,
+    "wagenpark": 207961,
+    "diefstalrisico": 1587,
+    "terug": 89,
+    "percentageTerug": "67,9%",
+  },
+];
+
 const diefstalrisicoHeaders = {
   "merk": {
-    "title": "Merk",
+    "title": "Merk/Type",
     "order": "descending",
     "inverted": false
   },
@@ -2356,7 +2476,7 @@ function initializeChart(chartFunction, selectElement) {
 
 // Initialize Bar chart
 initializeChart(() => {
-  const data = diefstalrisico;
+  const data = [diefstalrisico, diefstalrisicoTypes];
   const dataHeaders = diefstalrisicoHeaders;
   const options = {
     color: "#B7274C",
