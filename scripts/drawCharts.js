@@ -200,12 +200,15 @@ export async function drawMap(container, data, options) {
 
   // Create Tooltip Text
   function tooltipText(d) {
-    const gemeente = d.properties.statnaam
+    const gemeente = d.properties.statnaam;
+    let value = gestolen[gemeente][scaleVar];
     if (gestolen[gemeente] !== undefined) {
-      return gemeente + " " + gestolen[gemeente][scaleVar]
-    } else {
-      return gemeente + " data onbekend"
-    }
+      if (typeof value === "number") {
+        return gemeente + " " + value.toLocaleString("nl-nl");
+      } else {
+        return gemeente + " " + value.replace(".", ",");
+      }
+    return gemeente + " data onbekend";
   }
 }
 

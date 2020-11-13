@@ -2014,10 +2014,15 @@ async function drawMap(container, data, options) {
   // Create Tooltip Text
   function tooltipText(d) {
     const gemeente = d.properties.statnaam;
+    let value = gestolen[gemeente][scaleVar];
     if (gestolen[gemeente] !== undefined) {
-      return gemeente + " " + gestolen[gemeente][scaleVar]
+      if (typeof value === "number") {
+        return gemeente + " " + value.toLocaleString("nl-nl");
+      } else {
+        return gemeente + " " + value.replace(".", ",");
+      }
     } else {
-      return gemeente + " data onbekend"
+      return gemeente + " data onbekend";
     }
   }
 }
